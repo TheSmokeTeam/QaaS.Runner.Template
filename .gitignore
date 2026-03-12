@@ -1,5 +1,8 @@
+artifacts/
 bin/
 obj/
 .idea/
 .vs/
-artifacts/
+.templateengine/
+*.nupkg
+*.snupkg
