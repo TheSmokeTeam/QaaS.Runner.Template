@@ -5,14 +5,15 @@
     ".NET",
     "QaaS",
     "Runner",
-    "Rider"
+    "Rider",
+    "Template"
   ],
   "name": "QaaS Runner Project",
-  "identity": "SmokeTeam.QaaS.Runner.Project.1.0.0",
+  "identity": "SmokeTeam.QaaS.Runner.Project.1.1.0",
   "shortName": [
     "qaas-runner"
   ],
-  "description": "Creates a minimal Rider-friendly QaaS runner project.",
+  "description": "Creates a minimal Rider-friendly QaaS runner project with run-ready launch arguments.",
   "sourceName": "QaaS.Runner.Template",
   "preferNameDirectory": true,
   "primaryOutputs": [

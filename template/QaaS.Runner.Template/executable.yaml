@@ -1,5 +1,0 @@
-Commands:
-  - Id: Template
-    Command: template test.qaas.yaml
-  - Id: Run
-    Command: run test.qaas.yaml
