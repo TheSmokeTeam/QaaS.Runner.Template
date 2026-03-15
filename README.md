@@ -24,8 +24,6 @@ The easiest public install path is the GitHub release asset:
 
 Download it from the `1.1.0` release page for this repository, then install it with `dotnet new install`.
 
-This package can also be installed from GitHub Packages if you have a token that can read packages from `TheSmokeTeam`.
-
 ## Install From a Downloaded Release
 
 1. Download `QaaS.Runner.Template.1.1.0.nupkg` from the `1.1.0` release.
@@ -50,14 +48,6 @@ dotnet new install .
 ```
 
 This is the fastest way to test local changes before packaging a release.
-
-## Install From GitHub Packages
-
-GitHub Packages for NuGet requires authentication. After configuring your GitHub package source, install a specific version with:
-
-```bash
-dotnet new install QaaS.Runner.Template::1.1.0 --add-source https://nuget.pkg.github.com/TheSmokeTeam/index.json
-```
 
 ## Create a New Runner Project
 
