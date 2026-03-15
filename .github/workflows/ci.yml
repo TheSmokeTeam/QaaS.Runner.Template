@@ -62,7 +62,7 @@ jobs:
           dotnet new ${{ env.TEMPLATE_SHORT_NAME }} -n ${{ env.TEMPLATE_SMOKE_NAME }} -o smoke
           dotnet build smoke\${{ env.TEMPLATE_SMOKE_NAME }}.sln -c ${{ env.CONFIGURATION }}
           Push-Location smoke\${{ env.TEMPLATE_SMOKE_NAME }}
-          dotnet run -c ${{ env.CONFIGURATION }} --no-build --project .\${{ env.TEMPLATE_SMOKE_NAME }}\${{ env.TEMPLATE_SMOKE_NAME }}.csproj -- run test.qaas.yaml
+          dotnet run -c ${{ env.CONFIGURATION }} --no-build --project .\${{ env.TEMPLATE_SMOKE_NAME }}.csproj -- run test.qaas.yaml
           Pop-Location
 
       - name: Upload package artifact
