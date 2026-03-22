@@ -90,7 +90,7 @@ jobs:
           }
 
           $solutionPath = Join-Path $generatedRoot "$generatedName.sln"
-          $projectFile = Join-Path $generatedRoot $generatedName "$generatedName.csproj"
+          $projectFile = Join-Path (Join-Path $generatedRoot $generatedName) "$generatedName.csproj"
           $nuGetConfig = Join-Path $generatedRoot "NuGet.config"
           $yamlRunPath = "$generatedName/test.qaas.yaml"
 
