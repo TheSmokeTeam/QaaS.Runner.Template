@@ -5,32 +5,32 @@ Installable `dotnet new` template pack for creating Rider-friendly QaaS runner p
 ## What This Repo Publishes
 
 - Template package ID: `QaaS.Runner.Template`
-- Current release: `1.1.0`
 - Template short name: `qaas-runner`
 - Template display name in IDEs: `QaaS Runner Project`
 
 After the template pack is installed, Rider and the `dotnet new` CLI can create a new QaaS runner project with:
 
 - `Program.cs` wired to `QaaS.Runner.Bootstrap.New(args).Run()`
-- `QaaS.Runner` pinned to the latest published package at packaging time: `4.1.0-alpha.15`
-- `test.qaas.yaml` with temporary metadata placeholders and otherwise empty sections
+- `NuGet.config` defaulting to `nuget.org`
+- `QaaS.Runner` referenced with `Version="*"` so restore resolves the latest stable package on the configured feed
+- `test.qaas.yaml` with temporary metadata placeholders and otherwise empty sections that already lint and run successfully
 - Rider launch arguments preconfigured as `run test.qaas.yaml`
 
 ## Download Options
 
-The easiest public install path is the GitHub release asset:
+The easiest public install path is the latest GitHub release asset:
 
-- `QaaS.Runner.Template.1.1.0.nupkg`
+- `QaaS.Runner.Template.<version>.nupkg`
 
-Download it from the `1.1.0` release page for this repository, then install it with `dotnet new install`.
+Download it from this repository's Releases page, then install it with `dotnet new install`.
 
 ## Install From a Downloaded Release
 
-1. Download `QaaS.Runner.Template.1.1.0.nupkg` from the `1.1.0` release.
+1. Download `QaaS.Runner.Template.<version>.nupkg` from Releases.
 2. Install it:
 
 ```bash
-dotnet new install .\QaaS.Runner.Template.1.1.0.nupkg
+dotnet new install .\QaaS.Runner.Template.<version>.nupkg
 ```
 
 3. Verify it is available:
@@ -48,6 +48,12 @@ dotnet new install .
 ```
 
 This is the fastest way to test local changes before packaging a release.
+
+To run the full local validation flow that packs, installs, generates a repo, restores, builds, and runs the default config:
+
+```powershell
+.\tools\Validate-Template.ps1
+```
 
 ## Create a New Runner Project
 
@@ -68,7 +74,9 @@ Rider:
 
 If Rider was already open before installation, refresh the new project dialog or restart Rider.
 
-The generated project includes a `launchSettings.json` profile named `QaaS Runner` with `run test.qaas.yaml`, so the first local run in Rider is already pointed at the bundled YAML. That YAML is intentionally empty apart from metadata placeholders, so it must be filled in before execution will validate successfully.
+The generated project includes a `launchSettings.json` profile named `QaaS Runner` with `run test.qaas.yaml`, so the first local run in Rider is already pointed at the bundled YAML. The YAML is intentionally minimal but valid, which makes it safe to smoke-test immediately and then replace the placeholder metadata and add your real sessions and assertions.
+
+If you restore from a private feed or local Artifactory, update the generated `NuGet.config` before the first restore.
 
 ## Uninstall
 
@@ -104,13 +112,13 @@ dotnet new install .\QaaS.Runner.Template.<new-version>.nupkg
 Pick the exact release you want from GitHub Releases, download its `.nupkg`, then install that file:
 
 ```bash
-dotnet new install .\QaaS.Runner.Template.1.1.0.nupkg
+dotnet new install .\QaaS.Runner.Template.<version>.nupkg
 ```
 
 If you are installing from a package feed, the supported CLI syntax for a fixed version is:
 
 ```bash
-dotnet new install QaaS.Runner.Template::1.1.0
+dotnet new install QaaS.Runner.Template::<version>
 ```
 
 ## Build the Template Pack Locally
