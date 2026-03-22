@@ -26,8 +26,10 @@ The generated repo includes:
 
 If you restore from a private feed or local Artifactory, update the generated `NuGet.config` before the first restore.
 
-## Validate Local Changes
+## Pack Locally
 
-```powershell
-.\tools\Validate-Template.ps1
+```bash
+dotnet pack .\QaaS.Runner.Template.Package.csproj -p:PackageVersion=1.2.1 -o .\artifacts\package
+dotnet new install .\artifacts\package\QaaS.Runner.Template.1.2.1.nupkg
+dotnet new qaas-runner -n MyCompany.QaaS.Runner
 ```

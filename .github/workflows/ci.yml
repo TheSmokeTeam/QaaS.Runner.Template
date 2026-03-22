@@ -1,5 +1,8 @@
 name: CI
 
+permissions:
+  contents: write
+
 on:
   push:
     branches: ["**"]
@@ -33,14 +36,87 @@ jobs:
             echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Validate template
+      - name: Resolve package version
+        id: version
         shell: pwsh
         run: |
           $packageVersion = "${{ steps.tag.outputs.tag }}"
           if ([string]::IsNullOrWhiteSpace($packageVersion)) {
-            .\tools\Validate-Template.ps1 -Configuration $env:CONFIGURATION
-          } else {
-            .\tools\Validate-Template.ps1 -Configuration $env:CONFIGURATION -PackageVersion $packageVersion
+            [xml]$projectXml = Get-Content .\QaaS.Runner.Template.Package.csproj
+            $packageVersion = $projectXml.Project.PropertyGroup.Version
+          }
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "packageVersion=$packageVersion"
+
+      - name: Pack template
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path .\artifacts\package | Out-Null
+          dotnet pack .\QaaS.Runner.Template.Package.csproj `
+            --configuration $env:CONFIGURATION `
+            -p:PackageVersion=${{ steps.version.outputs.packageVersion }} `
+            --output .\artifacts\package
+          if ($LASTEXITCODE -ne 0) {
+            throw "dotnet pack failed."
+          }
+
+      - name: Smoke test template
+        shell: pwsh
+        run: |
+          $generatedName = "Smoke.QaaS.Runner"
+          $runRoot = Join-Path $PWD "artifacts\smoke\$([Guid]::NewGuid().ToString('N'))"
+          $generatedRoot = Join-Path $runRoot "generated"
+          New-Item -ItemType Directory -Force -Path $runRoot | Out-Null
+
+          $env:DOTNET_CLI_HOME = Join-Path $runRoot "cli-home"
+          $env:NUGET_PACKAGES = Join-Path $runRoot "nuget-packages"
+          $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = "1"
+
+          $package = Get-ChildItem .\artifacts\package\QaaS.Runner.Template.*.nupkg |
+            Where-Object { $_.Name -notlike "*.snupkg" } |
+            Select-Object -First 1
+
+          if ($null -eq $package) {
+            throw "Template package was not created."
+          }
+
+          dotnet new install $package.FullName
+          if ($LASTEXITCODE -ne 0) {
+            throw "dotnet new install failed."
+          }
+
+          dotnet new qaas-runner -n $generatedName -o $generatedRoot
+          if ($LASTEXITCODE -ne 0) {
+            throw "dotnet new qaas-runner failed."
+          }
+
+          $solutionPath = Join-Path $generatedRoot "$generatedName.sln"
+          $projectFile = Join-Path $generatedRoot $generatedName "$generatedName.csproj"
+          $nuGetConfig = Join-Path $generatedRoot "NuGet.config"
+          $yamlRunPath = "$generatedName/test.qaas.yaml"
+
+          dotnet restore $solutionPath --configfile $nuGetConfig
+          if ($LASTEXITCODE -ne 0) {
+            throw "dotnet restore failed."
+          }
+
+          dotnet build $solutionPath -c $env:CONFIGURATION --no-restore
+          if ($LASTEXITCODE -ne 0) {
+            throw "dotnet build failed."
+          }
+
+          Push-Location $generatedRoot
+          try {
+            $runOutput = & dotnet run -c $env:CONFIGURATION --project $projectFile -- run $yamlRunPath 2>&1 | Out-String
+            if ($LASTEXITCODE -ne 0) {
+              throw "Runner smoke execution failed.`n$runOutput"
+            }
+          }
+          finally {
+            Pop-Location
+          }
+
+          if ($runOutput -notmatch "ExitCode=0") {
+            throw "Runner smoke execution did not finish with ExitCode=0.`n$runOutput"
           }
 
       - name: Upload package artifact
@@ -49,3 +125,11 @@ jobs:
         with:
           name: qaas-runner-template-package
           path: artifacts\package\QaaS.Runner.Template.*.nupkg
+
+      - name: Create GitHub release
+        if: steps.tag.outputs.tag != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts\package\QaaS.Runner.Template.*.nupkg
+          fail_on_unmatched_files: true
+          generate_release_notes: true
