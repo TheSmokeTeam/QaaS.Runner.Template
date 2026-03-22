@@ -1,16 +1,6 @@
 MetaData:
   Team: TEMP_TEAM
   System: TEMP_SYSTEM
-  ExtraLabels:
-    Environment: TEMP_ENVIRONMENT
-    Owner: TEMP_OWNER
 
-Storages:
-  - FileSystem:
-      Path: artifacts/sessions
-
-DataSources: []
-
-Sessions: []
-
-Assertions: []
+Sessions:
+  - Name: Session

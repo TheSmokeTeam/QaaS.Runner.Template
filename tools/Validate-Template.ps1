@@ -151,6 +151,7 @@ $projectFile = Join-Path $generatedProjectRoot "$generatedName.csproj"
 $nuGetConfig = Join-Path $generatedRoot "NuGet.config"
 $readmePath = Join-Path $generatedRoot "README.md"
 $yamlPath = Join-Path $generatedProjectRoot "test.qaas.yaml"
+$yamlRunPath = "$generatedName/test.qaas.yaml"
 $assetsFile = Join-Path $generatedProjectRoot "obj\project.assets.json"
 
 Assert-True (Test-Path $solutionPath) "Generated solution file is missing."
@@ -162,6 +163,8 @@ Assert-True (Test-Path $yamlPath) "Generated test.qaas.yaml is missing."
 $projectText = Get-Content $projectFile -Raw
 $nuGetConfigText = Get-Content $nuGetConfig -Raw
 $readmeText = Get-Content $readmePath -Raw
+$programText = Get-Content (Join-Path $generatedProjectRoot "Program.cs") -Raw
+$yamlText = Get-Content $yamlPath -Raw
 
 Assert-True ($projectText -match '<PackageReference Include="QaaS\.Runner" Version="\*" />') (
     "Generated project should use a floating QaaS.Runner package reference."
@@ -172,8 +175,26 @@ Assert-True ($nuGetConfigText -match 'https://api\.nuget\.org/v3/index\.json') (
 Assert-True ($readmeText -match 'NuGet\.config') (
     "Generated README should mention the project-local NuGet.config."
 )
-Assert-True ($readmeText -notmatch 'will fail validation') (
-    "Generated README should no longer claim the default runner YAML fails validation."
+Assert-True ($programText.Trim() -eq 'QaaS.Runner.Bootstrap.New(args).Run();') (
+    "Generated Program.cs should contain only the runner bootstrap call."
+)
+Assert-True ($yamlText -match '(?m)^MetaData:\s*$') (
+    "Generated YAML should include the minimal MetaData section."
+)
+Assert-True ($yamlText -match '(?m)^Sessions:\s*$') (
+    "Generated YAML should include a Sessions section."
+)
+Assert-True ($yamlText -match '(?m)^\s+- Name: Session\s*$') (
+    "Generated YAML should include the default Session entry."
+)
+Assert-True ($yamlText -notmatch '(?m)^Storages:\s*$') (
+    "Generated YAML should not include a Storages section."
+)
+Assert-True ($yamlText -notmatch '(?m)^Assertions:\s*$') (
+    "Generated YAML should not include an Assertions section."
+)
+Assert-True ($yamlText -notmatch '(?m)^DataSources:\s*$') (
+    "Generated YAML should not include a DataSources section."
 )
 
 dotnet restore $solutionPath --configfile $nuGetConfig
@@ -186,9 +207,15 @@ if ($LASTEXITCODE -ne 0) {
     throw "dotnet build failed."
 }
 
-$runOutput = & dotnet run -c $Configuration --project $projectFile -- run test.qaas.yaml 2>&1 | Out-String
-if ($LASTEXITCODE -ne 0) {
-    throw "Runner smoke execution failed.`n$runOutput"
+Push-Location $generatedRoot
+try {
+    $runOutput = & dotnet run -c $Configuration --project $projectFile -- run $yamlRunPath 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) {
+        throw "Runner smoke execution failed.`n$runOutput"
+    }
+}
+finally {
+    Pop-Location
 }
 
 Assert-True ($runOutput -match 'ExitCode=0') (
