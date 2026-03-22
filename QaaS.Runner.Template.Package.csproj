@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <PackageId>QaaS.Runner.Template</PackageId>
-    <Version>1.2.1</Version>
+    <Version>1.2.2</Version>
     <Authors>SmokeTeam</Authors>
     <Description>Installable dotnet new template pack for Rider-friendly QaaS runner projects with run-ready launch arguments.</Description>
     <PackageTags>dotnet-new;template;qaas;runner;rider</PackageTags>
