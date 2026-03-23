@@ -92,7 +92,7 @@ jobs:
           $solutionPath = Join-Path $generatedRoot "$generatedName.sln"
           $projectFile = Join-Path (Join-Path $generatedRoot $generatedName) "$generatedName.csproj"
           $nuGetConfig = Join-Path $generatedRoot "NuGet.config"
-          $yamlRunPath = "$generatedName/test.qaas.yaml"
+          $yamlRunPath = "test.qaas.yaml"
 
           dotnet restore $solutionPath --configfile $nuGetConfig
           if ($LASTEXITCODE -ne 0) {

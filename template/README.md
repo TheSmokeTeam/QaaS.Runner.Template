@@ -13,7 +13,7 @@ This project was created from the `QaaS.Runner.Template` dotnet template pack.
 
 ```bash
 dotnet restore --configfile NuGet.config
-dotnet run --project QaaS.Runner.Template/QaaS.Runner.Template.csproj -- run QaaS.Runner.Template/test.qaas.yaml
+dotnet run --project QaaS.Runner.Template/QaaS.Runner.Template.csproj -- run test.qaas.yaml
 ```
 
 Replace the placeholder metadata and expand the session before using the project for real workloads.
