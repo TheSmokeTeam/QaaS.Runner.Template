@@ -29,7 +29,13 @@ If you restore from a private feed or local Artifactory, update the generated `N
 ## Pack Locally
 
 ```bash
-dotnet pack .\QaaS.Runner.Template.Package.csproj -p:PackageVersion=1.3.0 -o .\artifacts\package
-dotnet new install .\artifacts\package\QaaS.Runner.Template.1.3.0.nupkg
+dotnet pack .\QaaS.Runner.Template.Package.csproj -p:PackageVersion=1.3.2 -o .\artifacts\package
+dotnet new install .\artifacts\package\QaaS.Runner.Template.1.3.2.nupkg
 dotnet new qaas-runner -n MyCompany.QaaS.Runner
+```
+
+Run the generated project from the project directory with:
+
+```bash
+dotnet run
 ```
