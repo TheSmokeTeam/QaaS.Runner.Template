@@ -102,7 +102,8 @@ jobs:
           }
 
           $solutionPath = Join-Path $generatedRoot "$generatedName.sln"
-          $projectFile = Join-Path (Join-Path $generatedRoot $generatedName) "$generatedName.csproj"
+          $projectRoot = Join-Path $generatedRoot $generatedName
+          $projectFile = Join-Path $projectRoot "$generatedName.csproj"
           $nuGetConfig = Join-Path $generatedRoot "NuGet.config"
           $yamlRunPath = "test.qaas.yaml"
 
@@ -116,7 +117,7 @@ jobs:
             throw "dotnet build failed."
           }
 
-          Push-Location $generatedRoot
+          Push-Location $projectRoot
           try {
             $runOutput = & dotnet run -c $env:CONFIGURATION --project $projectFile -- run $yamlRunPath 2>&1 | Out-String
             if ($LASTEXITCODE -ne 0) {
