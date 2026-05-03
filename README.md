@@ -24,10 +24,10 @@ The generated repo includes:
 - a minimal valid `test.qaas.yaml`
 - explicit YAML startup through `dotnet run -- run test.qaas.yaml`
 
-Create an airgapped-flavored project directly from the template with:
+Create a private-feed project directly from the template with:
 
 ```bash
-dotnet new qaas-runner -n MyCompany.QaaS.Runner --nugetFeedName qaas-airgap --nugetFeedUrl https://artifactory.example/api/nuget/qaas/index.json
+dotnet new qaas-runner -n MyCompany.QaaS.Runner --nugetFeedName qaas-private --nugetFeedUrl https://artifactory.example/api/nuget/qaas/index.json
 ```
 
 If you publish a separate internal template package, keep the source tree shared and change only the `defaultValue` entries for `nugetFeedName` and `nugetFeedUrl` in `template/.template.config/template.json` before packing the internal variant.
