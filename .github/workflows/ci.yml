@@ -75,13 +75,17 @@ jobs:
         shell: pwsh
         run: |
           $generatedName = "Smoke.QaaS.Runner"
+          $customGeneratedName = "Smoke.QaaS.Runner.Airgap"
           $runRoot = Join-Path $PWD "artifacts\smoke\$([Guid]::NewGuid().ToString('N'))"
           $generatedRoot = Join-Path $runRoot "generated"
+          $customGeneratedRoot = Join-Path $runRoot "generated-custom"
           New-Item -ItemType Directory -Force -Path $runRoot | Out-Null
 
           $env:DOTNET_CLI_HOME = Join-Path $runRoot "cli-home"
           $env:NUGET_PACKAGES = Join-Path $runRoot "nuget-packages"
           $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = "1"
+          $customFeedName = "qaas-airgap"
+          $customFeedUrl = "https://artifactory.example/api/nuget/qaas/index.json"
 
           $package = Get-ChildItem .\artifacts\package\QaaS.Runner.Template.*.nupkg |
             Where-Object { $_.Name -notlike "*.snupkg" } |
@@ -112,6 +116,11 @@ jobs:
             throw "dotnet restore failed."
           }
 
+          $packageListOutput = & dotnet list $projectFile package 2>&1 | Out-String
+          if ($packageListOutput -notmatch 'QaaS\.Runner\s+4\.\*\s+4\.\d+\.\d+') {
+            throw "Generated runner did not resolve the expected stable 4.x package line.`n$packageListOutput"
+          }
+
           dotnet build $solutionPath -c $env:CONFIGURATION --no-restore
           if ($LASTEXITCODE -ne 0) {
             throw "dotnet build failed."
@@ -130,6 +139,18 @@ jobs:
 
           if ($runOutput -notmatch "ExitCode=0") {
             throw "Runner smoke execution did not finish with ExitCode=0.`n$runOutput"
+          }
+
+          dotnet new qaas-runner -n $customGeneratedName -o $customGeneratedRoot --skipRestore true --nugetFeedName $customFeedName --nugetFeedUrl $customFeedUrl
+          if ($LASTEXITCODE -ne 0) {
+            throw "dotnet new qaas-runner custom feed generation failed."
+          }
+
+          $customNuGetConfig = Join-Path $customGeneratedRoot "NuGet.config"
+          [xml]$customNuGetXml = Get-Content $customNuGetConfig
+          $customSource = $customNuGetXml.configuration.packageSources.add | Select-Object -First 1
+          if ($customSource.key -ne $customFeedName -or $customSource.value -ne $customFeedUrl) {
+            throw "Custom runner NuGet.config did not render the requested feed values."
           }
 
       - name: Upload package artifact

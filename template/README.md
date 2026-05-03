@@ -4,7 +4,7 @@ This project was created from the `QaaS.Runner.Template` dotnet template pack.
 
 ## Included Defaults
 
-- `NuGet.config` defaults restores to `nuget.org`
+- `NuGet.config` defaults restores to `nuget.org`, but you can override the generated feed with `--nugetFeedName` and `--nugetFeedUrl`
 - `Program.cs` runs `QaaS.Runner.Bootstrap.New(args).Run()`
 - `test.qaas.yaml` contains only placeholder metadata and one minimal session
 - Rider launch settings use `run test.qaas.yaml`

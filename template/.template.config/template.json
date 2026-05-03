@@ -29,6 +29,20 @@
     "type": "project"
   },
   "symbols": {
+    "nugetFeedName": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "nuget.org",
+      "replaces": "QAAS_NUGET_FEED_NAME",
+      "description": "NuGet feed name written into the generated NuGet.config."
+    },
+    "nugetFeedUrl": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "https://api.nuget.org/v3/index.json",
+      "replaces": "QAAS_NUGET_FEED_URL",
+      "description": "NuGet feed URL written into the generated NuGet.config."
+    },
     "skipRestore": {
       "type": "parameter",
       "datatype": "bool",
