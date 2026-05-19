@@ -19,12 +19,12 @@ dotnet new qaas-runner -n MyCompany.QaaS.Runner
 ```
 
 The generated repo includes:
-- `NuGet.config` pointing at `nuget.org`
+- `NuGet.config` using `QAAS_NUGET_SOURCE_URL`
 - `QaaS.Runner` with `Version="*"` so restore pulls the latest stable version from the configured feed
 - a minimal valid `test.qaas.yaml`
 - explicit YAML startup through `dotnet run -- run test.qaas.yaml`
 
-If you restore from a private feed or local Artifactory, update the generated `NuGet.config` before the first restore.
+If you restore from a private feed or local Artifactory, set `QAAS_NUGET_SOURCE_URL` before restoring the generated project.
 
 ## Pack Locally
 
