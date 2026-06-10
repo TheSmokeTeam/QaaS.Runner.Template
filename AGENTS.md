@@ -7,9 +7,9 @@ Guidance for AI agents working in this repository.
 The `dotnet new` template package for QaaS test-runner projects.
 
 - Install: `dotnet new install QaaS.Runner.Template` → instantiate: `dotnet new qaas-runner -n Org.Project`
-- Package: `QaaS.Runner.Template` (PackageType=Template); template identity `SmokeTeam.QaaS.Runner.Project`.
+- Package: `QaaS.Runner.Template` (PackageType=Template); template identity `SmokeTeam.QaaS.Runner.Project.1.2.2`.
 - Generated project: net10.0 Exe, one-line `Program.cs` (`QaaS.Runner.Bootstrap.New(args).Run();`), `test.qaas.yaml` starter config, NuGet.config, reference to `QaaS.Runner` with `Version="*"` (floats to latest).
-- Run a generated project: `dotnet run -- run test.qaas.yaml`.
+- Run a generated project: `dotnet run --project <name>.csproj -- run test.qaas.yaml`.
 
 ## Layout
 
